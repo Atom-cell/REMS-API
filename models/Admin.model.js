@@ -17,6 +17,9 @@ const adminSchema = mongoose.Schema(
     password: {
       type: String,
     },
+    profilePicture: {
+      String,
+    },
     role: {
       type: String,
     },
@@ -24,6 +27,13 @@ const adminSchema = mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    employees: [{ type: mongoose.Schema.Types.ObjectId, ref: "myEmployee" }],
+    blockSites: [
+      {
+        siteName: String,
+        address: String,
+      },
+    ],
   },
   { timestamps: true }
 );

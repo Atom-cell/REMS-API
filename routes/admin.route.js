@@ -12,19 +12,24 @@ router.post("/register", async (req, res, next) => {
   //check user already exists or not
   const user = await Admin.findOne({ email: email });
   if (user) {
-    return res.json({ msg: "User already exists" });
+    // 0 = User already exists
+    return res.json({ msg: 0 });
+  } else {
+    const hashPassword = await bcrypt.hash(password, 5);
+    let newAdmin = new Admin({
+      username,
+      email,
+      password: hashPassword,
+      role: "admin",
+    });
+    //// 1 = User registered
+    newAdmin
+      .save()
+      .then((data) => res.status(200).json({ data: data, msg: 1 }))
+      .catch((err) => res.status(err));
+
+    console.log(newAdmin);
   }
-  const hashPassword = await bcrypt.hash(password, 10);
-  let newAdmin = new Admin({
-    username,
-    email,
-    password: hashPassword,
-    role: "admin",
-  });
-  newAdmin
-    .save()
-    .then((data) => res.status(200).json(data))
-    .catch((err) => res.status(err));
 });
 
 module.exports = router;
