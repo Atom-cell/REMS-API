@@ -72,9 +72,9 @@ router.get("/verify", async (req, res) => {
     admin.emailToken = null;
     await admin.save();
     console.log("VERIFIEddd");
-    res.redirect("/home");
+    res.redirect("http://localhost:3000/home");
   } else {
-    res.redirect("/home");
+    res.redirect("http://localhost:3000/home");
   }
 });
 

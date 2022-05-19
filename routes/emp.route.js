@@ -3,42 +3,75 @@ const router = express.Router();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
+const nodemailer = require("nodemailer");
+const crypto = require("crypto");
 
 const Emp = require("../models/Emp.model");
 const Admin = require("../models/Admin.model");
 
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.MAIL,
+    pass: process.env.PASSWORD,
+  },
+  tls: {
+    rejectUnauthorized: false,
+  },
+});
+
 router.post("/register", async (req, res, next) => {
-  let { username, email, password } = req.body;
+  let { email } = req.body;
 
   //check user already exists or not
   const user = await Emp.findOne({ email: email });
   if (user) {
     return res.json({ msg: 0 });
+  } else {
+    let password = crypto.randomBytes(64).toString("hex");
+    const hashPassword = await bcrypt.hash(password, 10);
+    let newEmp = new Emp({
+      email,
+      password: hashPassword,
+    });
+    newEmp
+      .save()
+      .then((data) => res.status(200).json({ data: data, msg: 1 }))
+      .catch((err) => res.status(err));
+
+    let mailOptions = {
+      from: ' "Verify your email" <cinnakale@gmail.com>',
+      to: email,
+      subject: "REMS - Login Credentials",
+      html: `
+      <h2>Thank you for choosing REMS </h2>
+      <h4>Following are your credentials</h4>
+      <p>Email: ${email}</p>
+      <p>Password: ${password}</p>
+      <a href="http://localhost:3000/login">Login to REMS</a>`,
+    };
+
+    transporter.sendMail(mailOptions, (err, info) => {
+      if (err) console.log(err);
+      else {
+        console.log("VERIFICATION EMAIL SENT!!!");
+      }
+    });
   }
-  const hashPassword = await bcrypt.hash(password, 10);
-  let newEmp = new Emp({
-    username,
-    email,
-    password: hashPassword,
-  });
-  newEmp
-    .save()
-    .then((data) => res.status(200).json({ data: data, msg: 1 }))
-    .catch((err) => res.status(err));
 });
 
 router.post("/login", async (req, res) => {
   let { email, password } = req.body;
-  console.log(email, password);
+  console.log("LOGIN: ", email, password);
 
   //check user already exists or not
   const Euser = await Emp.findOne({ email: email });
   const Auser = await Admin.findOne({ email: email });
 
   /////
+  ////////
   ///////////
-  /////////////
-  ////////////////////
+  //////////////
 
   ///////////// update desktop
   if (Euser) {
@@ -56,8 +89,8 @@ router.post("/login", async (req, res) => {
         { email: Auser.email, role: Auser.role },
         "helloworld"
       );
-      return res.json({ data: Euser, msg: 1, token: token, auth: true });
-    } else return res.json({ data: Euser, msg: 0 });
+      return res.json({ data: Auser, msg: 1, token: token, auth: true });
+    } else return res.json({ data: Auser, msg: 0 });
   } else {
     return res.json({ msg: 0 });
   }
