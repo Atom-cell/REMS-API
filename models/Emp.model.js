@@ -19,10 +19,11 @@ var empSchema = mongoose.Schema({
     type: String,
     default: "Employee",
   },
-  // verified: {
-  //   type: Boolean,
-  //   default: false,
-  // },
+  verified: {
+    type: Boolean,
+    default: false,
+  },
+  emailToken: String,
   updated: {
     type: Boolean,
     default: false,

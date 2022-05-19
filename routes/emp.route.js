@@ -35,6 +35,12 @@ router.post("/login", async (req, res) => {
   const Euser = await Emp.findOne({ email: email });
   const Auser = await Admin.findOne({ email: email });
 
+  /////
+  ///////////
+  /////////////
+  ////////////////////
+
+  ///////////// update desktop
   if (Euser) {
     if (await bcrypt.compare(req.body.password, Euser.password)) {
       const token = jwt.sign(
@@ -69,6 +75,7 @@ router.put("/update", async (req, res) => {
       updated: true,
       contact: contact,
       bankDetails: bank,
+      verified: true,
     }
   )
     .then((data) => {
@@ -139,12 +146,13 @@ const verifyJWT = (req, res, next) => {
   } else {
     jwt.verify(token, "helloworld", (err, data) => {
       if (err) res.json({ auth: false, msg: "fail auth" });
-      ///////
-      ///////////
-      ///////////
-      //////////// console this info
+
       req.userEmail = data.email;
       req.role = data.role;
+      console.log("EMAIl: ", req.userEmail);
+
+      console.log("ROle: ", req.role);
+
       next();
     });
   }
