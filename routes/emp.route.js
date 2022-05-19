@@ -37,31 +37,44 @@ router.post("/login", async (req, res) => {
 
   if (Euser) {
     if (await bcrypt.compare(req.body.password, Euser.password)) {
-      return res.json({ data: Euser, msg: 1 });
+      const token = jwt.sign(
+        { email: Euser.email, role: Euser.role },
+        "helloworld"
+      );
+      return res.json({ data: Euser, msg: 1, token: token, auth: true });
     } else return res.json({ data: Euser, msg: 0 });
   }
   if (Auser) {
     if (await bcrypt.compare(password, Auser.password)) {
-      return res.json({ data: Auser, msg: 1 });
+      const token = jwt.sign(
+        { email: Auser.email, role: Auser.role },
+        "helloworld"
+      );
+      return res.json({ data: Euser, msg: 1, token: token, auth: true });
     } else return res.json({ data: Euser, msg: 0 });
   } else {
     return res.json({ msg: 0 });
   }
+});
 
-  // if (user) {
-  //   //password match
-  //   if(bcrypt.compare(password, user.password)){
-  //     return res.json({ msg: 1 });
-  //   }
-  //   else{
-  //     //password wrong
-  //     return res.json({ msg: 0 });
-  //   }
-  // }
-  // else{
-  //   //0 = user not regsistered
-  //   return res.json({msg:0})
-  // }
+router.put("/update", async (req, res) => {
+  const { email, username, password, contact, bank } = req.body;
+  console.log(email, username, password, contact, bank);
+  const hashPassword = await bcrypt.hash(password, 10);
+  Emp.findOneAndUpdate(
+    { email: email },
+    {
+      username: username,
+      password: hashPassword,
+      updated: true,
+      contact: contact,
+      bankDetails: bank,
+    }
+  )
+    .then((data) => {
+      res.json({ data: data, msg: 1 });
+    })
+    .catch((err) => res.status(err));
 });
 
 //active idle time
@@ -118,6 +131,26 @@ router.post("/apptime", (req, res) => {
   } catch (e) {
     res.send(e);
   }
+});
+const verifyJWT = (req, res, next) => {
+  const token = req.headers["x-access-token"];
+  if (!token) {
+    res.send("yo, we need token");
+  } else {
+    jwt.verify(token, "helloworld", (err, data) => {
+      if (err) res.json({ auth: false, msg: "fail auth" });
+      ///////
+      ///////////
+      ///////////
+      //////////// console this info
+      req.userEmail = data.email;
+      req.role = data.role;
+      next();
+    });
+  }
+};
+router.get("/checkAuth", verifyJWT, (req, res) => {
+  res.send("YO! you are authenticated, COngrats!!");
 });
 
 module.exports = router;

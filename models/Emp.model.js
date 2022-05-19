@@ -19,9 +19,16 @@ var empSchema = mongoose.Schema({
     type: String,
     default: "Employee",
   },
-  verified: {
+  // verified: {
+  //   type: Boolean,
+  //   default: false,
+  // },
+  updated: {
     type: Boolean,
     default: false,
+  },
+  contact: {
+    type: String,
   },
   desktop: Boolean,
   status: Boolean,
@@ -45,6 +52,7 @@ var empSchema = mongoose.Schema({
     },
   ],
   billingId: String, // This is Stripe Customer ID
+  bankDetails: String,
 });
 
 module.exports = mongoose.model("employee", empSchema);

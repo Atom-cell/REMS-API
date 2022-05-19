@@ -23,10 +23,11 @@ const adminSchema = mongoose.Schema(
     role: {
       type: String,
     },
-    confirmed: {
+    verified: {
       type: Boolean,
       default: false,
     },
+
     employees: [{ type: mongoose.Schema.Types.ObjectId, ref: "myEmployee" }],
     blockSites: [
       {
