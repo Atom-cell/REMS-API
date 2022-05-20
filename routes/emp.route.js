@@ -6,8 +6,6 @@ require("dotenv").config();
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
 const mongoose = require("mongoose");
-const { Schema } = mongoose;
-
 const Emp = require("../models/Emp.model");
 const Admin = require("../models/Admin.model");
 const { response } = require("express");
@@ -163,7 +161,16 @@ router.delete("/deleteEmp/:id", verifyJWT, (req, res) => {
   console.log("In Delete");
   console.log(req.params.id);
 
-  //6287fdddc66ebe2342a67bb3
+  //6287ffd800aa0f2419e224df
+
+  Admin.findOneAndUpdate(
+    { email: req.userEmail },
+    { $pull: { employees: req.params.id } }
+  ).then((response) => console.log(response));
+
+  Emp.findByIdAndDelete(req.params.id).then((response) =>
+    console.log(response)
+  );
 });
 
 router.put("/update", async (req, res) => {
