@@ -31,7 +31,10 @@ var empSchema = mongoose.Schema({
   contact: {
     type: String,
   },
-  desktop: Boolean,
+  desktop: {
+    type: Boolean,
+    default: false,
+  },
   status: Boolean,
   totalTime: [
     {
