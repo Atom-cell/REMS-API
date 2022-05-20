@@ -39,6 +39,7 @@ router.post("/register", async (req, res, next) => {
       .then((data) => res.status(200).json({ data: data, msg: 1 }))
       .catch((err) => res.status(err));
 
+    //send email
     let mailOptions = {
       from: ' "Verify your email" <cinnakale@gmail.com>',
       to: email,
@@ -117,6 +118,65 @@ router.put("/update", async (req, res) => {
     .catch((err) => res.status(err));
 });
 
+router.post("/reset", async (req, res) => {
+  console.log("IN RESET");
+  const { email } = req.body;
+
+  const Euser = await Emp.findOne({ email: email });
+  const Auser = await Admin.findOne({ email: email });
+  let password = crypto.randomBytes(64).toString("hex");
+
+  if (Euser) {
+    Euser.password = password;
+    Euser.save();
+    let mailOptions = {
+      from: ' "Reset Password" <cinnakale@gmail.com>',
+      to: email,
+      subject: "REMS - Reset Password",
+      html: `
+      <h2>Thank you for choosing REMS </h2>
+      <h4>Following are your credentials</h4>
+      <p>Email: ${email}</p>
+      <p>Password: ${password}</p>
+      <a href="http://localhost:3000/login">Login to REMS</a>`,
+    };
+
+    transporter.sendMail(mailOptions, (err, info) => {
+      if (err) console.log(err);
+      else {
+        console.log("VERIFICATION EMAIL SENT!!!");
+      }
+    });
+
+    res.json({ msg: 1 });
+  } else if (Auser) {
+    Auser.password = password;
+    Auser.save();
+    let mailOptions = {
+      from: ' "Reset Password" <cinnakale@gmail.com>',
+      to: email,
+      subject: "REMS - Reset Password",
+      html: `
+      <h2>Thank you for choosing REMS </h2>
+      <h4>Following are your credentials</h4>
+      <p>Email: ${email}</p>
+      <p>Password: ${password}</p>
+      <a href="http://localhost:3000/login">Login to REMS</a>`,
+    };
+
+    transporter.sendMail(mailOptions, (err, info) => {
+      if (err) console.log(err);
+      else {
+        console.log("VERIFICATION EMAIL SENT!!!");
+      }
+    });
+
+    res.json({ msg: 1 });
+  } else {
+    console.log("else");
+    res.json({ msg: 0 });
+  }
+});
 //active idle time
 router.post("/times", (req, res) => {
   const { email, active_time, idle_time } = req.body;
