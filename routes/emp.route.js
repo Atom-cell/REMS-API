@@ -157,6 +157,7 @@ router.post("/login", async (req, res) => {
   }
 });
 
+// delete from admin not work
 router.delete("/deleteEmp/:id", verifyJWT, (req, res) => {
   console.log("In Delete");
   console.log(req.params.id);
