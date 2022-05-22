@@ -33,9 +33,8 @@ io.on("connection", (socket) => {
   //socket.emit("code", "2216");
 
   socket.on("Email", (data) => {
-    console.log("SOCKET EMAIL");
     sock[data] = socket.id;
-    console.log(sock[data]);
+    console.log("SOCKET EMAIL", data, " : ", sock[data]);
   });
 
   console.log("ID ", socket.id);
@@ -60,18 +59,21 @@ io.on("connection", (socket) => {
 });
 
 // from web visit this route, then on utility it will emit. front se email send. idher email se sock mai se id nikalo or emit krdo usko
-app.get("/start", (req, res) => {
-  let e = "naseer@gmail.com";
-  let a = sock[e];
-  console.log("Sending signal to turn on SS", a);
+app.get("/start/:mail", (req, res) => {
+  console.log(req.params.mail);
+
+  let a = sock[req.params.mail];
+  console.log("Sending START signal to turn ON SS", a);
   io.to(a).emit("SSStart", "true");
   res.send("hello ");
 });
 
-app.get("/stop", (req, res) => {
-  let e = "naseer@gmail.com";
+app.get("/stop/:mail", (req, res) => {
+  const email = req.params.mail;
+  console.log(email);
+  let e = email;
   let a = sock[e];
-  console.log("Sending signal to turn on SS", a);
+  console.log("Sending STOP signal to turn OFF SS", a);
   io.to(a).emit("SSStop", "true");
   res.send("hello ");
 });

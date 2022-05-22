@@ -39,19 +39,19 @@ const verifyJWT = (req, res, next) => {
     });
   }
 };
-router.get("/allEmps", verifyJWT, async (req, res) => {
-  console.log("In all Empps");
-  try {
-    Admin.find({ email: req.userEmail })
-      .populate("employees")
-      .exec(function (err, data) {
-        if (err) console.log(err.message);
-        res.json({ msg: 1, data: data[0].employees });
-      });
-  } catch (err) {
-    console.log(err.message);
-  }
-});
+// router.get("/allEmps", verifyJWT, async (req, res) => {
+//   console.log("In all Empps");
+//   try {
+//     Admin.find({ email: req.userEmail })
+//       .populate("employees")
+//       .exec(function (err, data) {
+//         if (err) console.log(err.message);
+//         res.json({ msg: 1, data: data[0].employees });
+//       });
+//   } catch (err) {
+//     console.log(err.message);
+//   }
+// });
 
 router.post("/register", verifyJWT, async (req, res, next) => {
   console.log("In Register");
@@ -100,6 +100,7 @@ router.post("/register", verifyJWT, async (req, res, next) => {
   // find admin
   // find user by email or _id
 
+  // adding in that admins emps list
   let a = newEmp._id;
   try {
     Admin.findOneAndUpdate(

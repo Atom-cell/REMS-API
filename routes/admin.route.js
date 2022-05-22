@@ -7,7 +7,26 @@ const crypto = require("crypto");
 require("dotenv").config();
 
 const Admin = require("../models/Admin.model");
+const Emp = require("../models/Emp.model");
 
+const verifyJWT = (req, res, next) => {
+  const token = req.headers["x-access-token"];
+  if (!token) {
+    res.send("yo, we need token");
+  } else {
+    jwt.verify(token, "helloworld", (err, data) => {
+      if (err) res.json({ auth: false, msg: "fail auth" });
+
+      req.userEmail = data.email;
+      req.role = data.role;
+      console.log("EMAIl: ", req.userEmail);
+
+      console.log("ROle: ", req.role);
+
+      next();
+    });
+  }
+};
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -18,6 +37,7 @@ const transporter = nodemailer.createTransport({
     rejectUnauthorized: false,
   },
 });
+
 router.post("/register", async (req, res, next) => {
   let { username, email, password } = req.body;
 
@@ -76,6 +96,24 @@ router.get("/verify", async (req, res) => {
   } else {
     res.redirect("http://localhost:3000/home");
   }
+});
+
+router.get("/allEmps", verifyJWT, async (req, res) => {
+  console.log("In all Empps");
+  try {
+    Admin.find({ email: req.userEmail })
+      .populate("employees")
+      .exec(function (err, data) {
+        if (err) console.log(err.message);
+        res.json({ msg: 1, data: data[0].employees });
+      });
+  } catch (err) {
+    console.log(err.message);
+  }
+});
+
+router.get("/aa", async (req, res) => {
+  res.redirect("http://localhost:3000/home");
 });
 
 module.exports = router;
