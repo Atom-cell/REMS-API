@@ -8,6 +8,7 @@ require("dotenv").config();
 
 const Admin = require("../models/Admin.model");
 const Emp = require("../models/Emp.model");
+const Activity = require("../models/Activity.model");
 
 const verifyJWT = (req, res, next) => {
   const token = req.headers["x-access-token"];
@@ -19,9 +20,9 @@ const verifyJWT = (req, res, next) => {
 
       req.userEmail = data.email;
       req.role = data.role;
-      console.log("EMAIl: ", req.userEmail);
+      //console.log("EMAIl: ", req.userEmail);
 
-      console.log("ROle: ", req.role);
+      //console.log("ROle: ", req.role);
 
       next();
     });
@@ -99,7 +100,7 @@ router.get("/verify", async (req, res) => {
 });
 
 router.get("/allEmps", verifyJWT, async (req, res) => {
-  console.log("In all Empps");
+  //console.log("In all Empps");
   try {
     Admin.find({ email: req.userEmail })
       .populate("employees")
@@ -112,8 +113,25 @@ router.get("/allEmps", verifyJWT, async (req, res) => {
   }
 });
 
+router.get("/logs/:email", verifyJWT, async (req, res) => {
+  console.log("In Logs", req.params.email);
+
+  Activity.find({ email: req.params.email }).then((response) => {
+    res.json({ data: response });
+  });
+});
 router.get("/aa", async (req, res) => {
   res.redirect("http://localhost:3000/home");
 });
 
+router.post("/postlog", (req, res) => {
+  let a = new Activity({
+    email: "zzzzzz099999@gmail.com",
+    app: "aasada",
+    time: "999:999:999",
+  });
+  a.save().then((response) => {
+    res.send("OK");
+  });
+});
 module.exports = router;

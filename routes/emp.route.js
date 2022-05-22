@@ -31,9 +31,9 @@ const verifyJWT = (req, res, next) => {
 
       req.userEmail = data.email;
       req.role = data.role;
-      console.log("EMAIl: ", req.userEmail);
+      // console.log("EMAIl: ", req.userEmail);
 
-      console.log("ROle: ", req.role);
+      // console.log("ROle: ", req.role);
 
       next();
     });
